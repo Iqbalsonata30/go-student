@@ -1,8 +1,14 @@
 package main
 
-import "fmt"
+import (
+	"log"
+
+	"github.com/iqbalsonata30/go-student/app"
+)
 
 func main() {
-
-	fmt.Println("Hello World")
+	db, err := app.NewDB()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
