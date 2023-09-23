@@ -9,3 +9,19 @@ Simple REST API that represents data of students. this project implements reposi
     <li><a href="https://github.com/julienschmidt/httprouter">httprouter</a> - HTTP Request Router </li>
   </ul>
 </div>
+
+## Endpoints
+
+### Create Student 
+``` bash
+POST api/v1/students
+e.g
+  {   
+    "name":"Iqbal Sonata",
+    "identityNumber":1234556789,
+    "gender":"Male",
+    "major":"Computer Engineering",
+    "class":"5-PTK-1",
+    "religion":"Islam"
+  }
+```
