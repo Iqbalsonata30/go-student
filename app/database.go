@@ -33,7 +33,9 @@ func (s *PostgresDB) Init() error {
             gender varchar(20) NOT NULL,
             major varchar(50) NOT NULL,
             class varchar(10) NOT NULL,
-            religion varchar(15) NOT NULL
+            religion varchar(15) NOT NULL,
+            created_at timestamp default CURRENT_TIMESTAMP,
+            updated_at timestamp default CURRENT_TIMESTAMP
     );`
 	_, err := s.db.ExecContext(s.ctx, query)
 	if err != nil {
