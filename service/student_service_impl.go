@@ -11,11 +11,11 @@ import (
 )
 
 type StudentServiceImpl struct {
-	Repository repository.StudentRepositoryImpl
+	Repository repository.StudentRepository
 	DB         *sql.DB
 }
 
-func NewStudentService(repository repository.StudentRepositoryImpl, DB *sql.DB) StudentService {
+func NewStudentService(repository repository.StudentRepository, DB *sql.DB) StudentService {
 	return &StudentServiceImpl{
 		Repository: repository,
 		DB:         DB,
@@ -29,6 +29,7 @@ func (s *StudentServiceImpl) Create(ctx context.Context, req web.StudentRequest)
 		Gender:         req.Gender,
 		Major:          req.Major,
 		Class:          req.Class,
+		Religion:       req.Religion,
 	}
 	tx, err := s.DB.Begin()
 	if err != nil {
