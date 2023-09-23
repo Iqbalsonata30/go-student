@@ -7,8 +7,11 @@ import (
 )
 
 func main() {
-	db, err := app.NewDB()
+	store, err := app.NewPostgresDB()
 	if err != nil {
+		log.Fatal(err)
+	}
+	if err := store.Init(); err != nil {
 		log.Fatal(err)
 	}
 }
