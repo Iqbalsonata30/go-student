@@ -15,13 +15,13 @@ Simple REST API that represents data of students. this project implements reposi
 ### Create Student 
 ``` bash
 POST api/v1/students
-e.g
+Request e.g
   {   
-    "name":"Iqbal Sonata",
-    "identityNumber":1234556789,
-    "gender":"Male",
-    "major":"Computer Engineering",
-    "class":"5-PTK-1",
-    "religion":"Islam"
+    "name":string,
+    "identityNumber":integer,
+    "gender":string,
+    "major":string,
+    "class":string,
+    "religion":string
   }
 ```
