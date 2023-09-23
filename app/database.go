@@ -1,15 +1,13 @@
 package app
 
 import (
-	"context"
 	"database/sql"
 
 	_ "github.com/lib/pq"
 )
 
 type PostgresDB struct {
-	db  *sql.DB
-	ctx context.Context
+	DB *sql.DB
 }
 
 func NewPostgresDB() (*PostgresDB, error) {
@@ -18,10 +16,8 @@ func NewPostgresDB() (*PostgresDB, error) {
 	if err != nil {
 		return nil, err
 	}
-	ctx := context.Background()
 	return &PostgresDB{
-		db:  db,
-		ctx: ctx,
+		DB: db,
 	}, nil
 }
 
@@ -33,9 +29,11 @@ func (s *PostgresDB) Init() error {
             gender varchar(20) NOT NULL,
             major varchar(50) NOT NULL,
             class varchar(10) NOT NULL,
-            religion varchar(15) NOT NULL
+            religion varchar(15) NOT NULL,
+            created_at timestamp default CURRENT_TIMESTAMP,
+            updated_at timestamp default CURRENT_TIMESTAMP
     );`
-	_, err := s.db.ExecContext(s.ctx, query)
+	_, err := s.DB.Exec(query)
 	if err != nil {
 		return err
 	}
