@@ -19,7 +19,7 @@ func main() {
 	if err := store.Init(); err != nil {
 		log.Fatal(err)
 	}
-	validate := validator.New()
+	validate := validator.New(validator.WithRequiredStructEnabled())
 	repository := repository.NewRepositoryStudent()
 	service := service.NewStudentService(repository, store.DB, validate)
 	controller := controller.NewStudentContoller(service)

@@ -10,6 +10,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/iqbalsonata30/go-student/app"
 	"github.com/iqbalsonata30/go-student/controller"
@@ -29,8 +30,10 @@ func SetupPostgresql() *sql.DB {
 }
 
 func SetupNewRouter(db *sql.DB) http.Handler {
+	validate := validator.New(validator.WithRequiredStructEnabled())
 	repository := repository.NewRepositoryStudent()
-	service := service.NewStudentService(repository, db)
+
+	service := service.NewStudentService(repository, db, validate)
 	controller := controller.NewStudentContoller(service)
 	router := app.NewRouter(controller)
 
