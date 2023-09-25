@@ -12,6 +12,8 @@ func ErrorHandler(w http.ResponseWriter, r *http.Request, err any) {
 	if validationError(w, r, err) {
 		return
 	}
+
+	internalError(w, r, err)
 }
 
 func validationError(w http.ResponseWriter, r *http.Request, err any) bool {
@@ -30,4 +32,13 @@ func validationError(w http.ResponseWriter, r *http.Request, err any) bool {
 	} else {
 		return false
 	}
+}
+
+func internalError(w http.ResponseWriter, r *http.Request, err any) {
+	apiResp := web.ApiError{
+		StatusCode: http.StatusInternalServerError,
+		Error:      err,
+	}
+	helper.JSONEncode(w, http.StatusInternalServerError, apiResp)
+
 }

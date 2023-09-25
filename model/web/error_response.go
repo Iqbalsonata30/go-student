@@ -6,6 +6,6 @@ type Error struct {
 }
 
 type ApiError struct {
-	StatusCode int     `json:"statusCode"`
-	Error      []Error `json:"error"`
+	StatusCode int `json:"statusCode"`
+	Error      any `json:"error"`
 }
