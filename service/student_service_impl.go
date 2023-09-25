@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/iqbalsonata30/go-student/helper"
 	"github.com/iqbalsonata30/go-student/model/domain"
 	"github.com/iqbalsonata30/go-student/model/web"
@@ -13,16 +14,22 @@ import (
 type StudentServiceImpl struct {
 	Repository repository.StudentRepository
 	DB         *sql.DB
+	Validate   *validator.Validate
 }
 
-func NewStudentService(repository repository.StudentRepository, DB *sql.DB) StudentService {
+func NewStudentService(repository repository.StudentRepository, DB *sql.DB, validator *validator.Validate) StudentService {
 	return &StudentServiceImpl{
 		Repository: repository,
 		DB:         DB,
+		Validate:   validator,
 	}
 }
 
 func (s *StudentServiceImpl) Create(ctx context.Context, req web.StudentRequest) (*web.StudentResponse, error) {
+	err := s.Validate.Struct(req)
+	if err != nil {
+		return nil, err
+	}
 	student := domain.Student{
 		Name:           req.Name,
 		IdentityNumber: req.IdentityNumber,
