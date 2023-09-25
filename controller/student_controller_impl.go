@@ -29,7 +29,7 @@ func (c *StudentControllerImpl) Create(w http.ResponseWriter, r *http.Request, _
 	}
 	res := web.ApiResponse{
 		StatusCode: http.StatusCreated,
-		Message:    "Student has been added sucesfully",
+		Message:    "Student has been added succesfully",
 		Data:       student,
 	}
 	helper.JSONEncode(w, http.StatusCreated, res)
