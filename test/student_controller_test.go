@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -22,7 +21,11 @@ func SetupPostgresql() *sql.DB {
 	connStr := "user=postgres  password=secret dbname=go_student sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
-		log.Fatal(err)
+		panic(err)
+	}
+	err = db.Ping()
+	if err != nil {
+		panic(err)
 	}
 
 	return db
@@ -80,7 +83,34 @@ func TestCreateStudentSuccess(t *testing.T) {
 	}
 }
 
-// unc TestCreateStudentFailed(t *testing.T) {
-// db := SetupPostgresql()
-// TruncateDB(db)
-// router := SetupNewRouter(db)
+func TestCreateStudent_WithValidationRequired(t *testing.T) {
+	db := SetupPostgresql()
+	TruncateDB(db)
+	router := SetupNewRouter(db)
+
+	reqBody := strings.NewReader(`{}`)
+
+	req := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/students", reqBody)
+	rec := httptest.NewRecorder()
+
+	router.ServeHTTP(rec, req)
+	res := rec.Result()
+	if res.Status != "400 Bad Request" {
+		t.Fatalf("status code should've  400 Bad Request but got : %v", res.Status)
+	}
+
+	body, _ := io.ReadAll(res.Body)
+	var resBody map[string]any
+	json.Unmarshal(body, &resBody)
+
+	if int(resBody["statusCode"].(float64)) != 400 {
+		t.Fatalf("status code should've  400 but got : %v", int(resBody["statusCode"].(float64)))
+	}
+
+	for _, v := range resBody["error"].([]any) {
+		if v.(map[string]any)["message"] != "this field is required" {
+			t.Fatalf("the validation should be this fields is required but got : %v", v.(map[string]any)["message"])
+		}
+	}
+
+}
