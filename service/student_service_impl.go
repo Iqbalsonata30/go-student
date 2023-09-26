@@ -25,7 +25,7 @@ func NewStudentService(repository repository.StudentRepository, DB *sql.DB, vali
 	}
 }
 
-func (s *StudentServiceImpl) Create(ctx context.Context, req web.StudentRequest) (*web.StudentResponse, error) {
+func (s *StudentServiceImpl) Create(ctx context.Context, req web.StudentRequest) (*web.CreateStudentResponse, error) {
 	err := s.Validate.Struct(req)
 	if err != nil {
 		return nil, err
@@ -50,5 +50,22 @@ func (s *StudentServiceImpl) Create(ctx context.Context, req web.StudentRequest)
 	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
-	return helper.EntityToResponse(res), nil
+	return helper.EntityToCreateResponse(res), nil
+}
+
+func (s *StudentServiceImpl) FindAll(ctx context.Context) (*[]web.StudentResponse, error) {
+	tx, err := s.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+	res, err := s.Repository.FindAll(ctx, tx)
+	if err != nil {
+		tx.Rollback()
+		return nil, err
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+	return helper.EntityToResponses(res), nil
+
 }

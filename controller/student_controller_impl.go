@@ -35,3 +35,18 @@ func (c *StudentControllerImpl) Create(w http.ResponseWriter, r *http.Request, _
 	}
 	helper.JSONEncode(w, http.StatusCreated, res)
 }
+
+func (c *StudentControllerImpl) FindAll(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	students, err := c.Service.FindAll(r.Context())
+	if err != nil {
+		exception.ErrorHandler(w, r, err)
+		return
+	}
+	res := web.ApiResponse{
+		StatusCode: http.StatusOK,
+		Message:    "Success get all data students",
+		Data:       students,
+	}
+	helper.JSONEncode(w, http.StatusOK, res)
+
+}

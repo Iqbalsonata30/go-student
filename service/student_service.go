@@ -7,5 +7,6 @@ import (
 )
 
 type StudentService interface {
-	Create(context.Context, web.StudentRequest) (*web.StudentResponse, error)
+	Create(context.Context, web.StudentRequest) (*web.CreateStudentResponse, error)
+	FindAll(context.Context) (*[]web.StudentResponse, error)
 }
