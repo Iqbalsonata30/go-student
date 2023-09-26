@@ -114,3 +114,30 @@ func TestCreateStudent_WithValidationRequired(t *testing.T) {
 	}
 
 }
+
+func TestNotFoundPage(t *testing.T) {
+	db := SetupPostgresql()
+	TruncateDB(db)
+	router := SetupNewRouter(db)
+	reqBody := strings.NewReader(`{}`)
+	req := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/stundetsts", reqBody)
+	rec := httptest.NewRecorder()
+
+	router.ServeHTTP(rec, req)
+	res := rec.Result()
+	if res.Status != "404 Not Found" {
+		t.Fatalf("status code should've 404 but got : %v", res.Status)
+	}
+	body, _ := io.ReadAll(res.Body)
+	var resBody map[string]any
+	json.Unmarshal(body, &resBody)
+
+	if int(resBody["statusCode"].(float64)) != 404 {
+		t.Fatalf("status code should've  404 but got : %v", int(resBody["statusCode"].(float64)))
+
+	}
+	if resBody["error"].(any) != "404 Page not found " {
+		t.Fatal("message should be 404 Page not found ")
+	}
+
+}
