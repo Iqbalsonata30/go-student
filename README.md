@@ -19,10 +19,30 @@ POST api/v1/students
 Request e.g
   {   
     "name":string,
-    "identityNumber":integer,
+    "identityNumber":int,
     "gender":string,
     "major":string,
     "class":string,
     "religion":string
   }
+```
+### Get Students
+``` bash
+GET api/v1/students
+Result e.g 
+    {
+      "statusCode":int,
+      "message":string,
+      "data":[
+        "id":string,
+        "name":string,
+        "identityNumber":int,
+        "gender":string,
+        "major":string,
+        "class":string,
+        "religion":string,
+        "createdAt":timestamp,
+        "updatedAt":timestamp
+      ]
+    }
 ```
