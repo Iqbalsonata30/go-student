@@ -9,6 +9,9 @@ import (
 )
 
 func ErrorHandler(w http.ResponseWriter, r *http.Request, err any) {
+	if notFoundError(w, r, err) {
+		return
+	}
 	if validationError(w, r, err) {
 		return
 	}
@@ -32,6 +35,21 @@ func validationError(w http.ResponseWriter, r *http.Request, err any) bool {
 	} else {
 		return false
 	}
+}
+
+func notFoundError(w http.ResponseWriter, r *http.Request, err any) bool {
+	exception, ok := err.(NotFoundError)
+	if ok {
+		apiResp := web.ApiError{
+			StatusCode: http.StatusNotFound,
+			Error:      exception.Error,
+		}
+		helper.JSONEncode(w, http.StatusNotFound, apiResp)
+		return true
+	} else {
+		return false
+	}
+
 }
 
 func internalError(w http.ResponseWriter, r *http.Request, err any) {

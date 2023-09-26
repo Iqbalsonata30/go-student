@@ -40,11 +40,11 @@ func (s *StudentServiceImpl) Create(ctx context.Context, req web.StudentRequest)
 	}
 	tx, err := s.DB.Begin()
 	if err != nil {
-		tx.Rollback()
 		return nil, err
 	}
 	res, err := s.Repository.Save(ctx, tx, student)
 	if err != nil {
+		tx.Rollback()
 		return nil, err
 	}
 	if err := tx.Commit(); err != nil {
