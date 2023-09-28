@@ -26,11 +26,11 @@ func EntityToResponse(student *domain.Student) *web.StudentResponse {
 
 }
 
-func EntityToResponses(students []domain.Student) *[]web.StudentResponse {
+func EntityToResponses(students []domain.Student) []web.StudentResponse {
 	var studentResponses []web.StudentResponse
 	for _, student := range students {
 		studentResponses = append(studentResponses, *EntityToResponse(&student))
 	}
-	return &studentResponses
+	return studentResponses
 
 }

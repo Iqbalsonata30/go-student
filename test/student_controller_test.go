@@ -1,8 +1,10 @@
 package test
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -13,6 +15,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/iqbalsonata30/go-student/app"
 	"github.com/iqbalsonata30/go-student/controller"
+	"github.com/iqbalsonata30/go-student/model/domain"
 	"github.com/iqbalsonata30/go-student/repository"
 	"github.com/iqbalsonata30/go-student/service"
 )
@@ -113,6 +116,58 @@ func TestCreateStudent_WithValidationRequired(t *testing.T) {
 		}
 	}
 
+}
+
+func TestGetAllStudents(t *testing.T) {
+	db := SetupPostgresql()
+	router := SetupNewRouter(db)
+	tx, _ := db.Begin()
+	studentRepository := repository.NewRepositoryStudent()
+	student, _ := studentRepository.Save(context.Background(), tx, domain.Student{
+		Name:           "test",
+		IdentityNumber: 2122,
+		Gender:         "male",
+		Major:          "test",
+		Class:          "test",
+		Religion:       "test",
+	})
+	tx.Commit()
+
+	req := httptest.NewRequest(http.MethodGet, "http://localhost:3000/api/v1/students", nil)
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+	res := rec.Result()
+	if res.StatusCode != 200 {
+		t.Fatalf("status code should've 200 but got : %v", res.StatusCode)
+	}
+
+	body, _ := io.ReadAll(res.Body)
+	var resBody map[string]any
+	json.Unmarshal(body, &resBody)
+
+	if resBody["message"] != "Success get all data students" {
+		t.Fatalf("message should be Success get all data students but got : %v", resBody["message"])
+	}
+	var students = resBody["data"].([]any)
+	studentRes := students[0].(map[string]any)
+	if studentRes["name"] != student.Name {
+		t.Fatalf(fmt.Sprintf("name should be %v but got %v", studentRes["name"], student.Name))
+	}
+	if int(studentRes["identityNumber"].(float64)) != student.IdentityNumber {
+		t.Fatalf(fmt.Sprintf("student's identityNumber should be %v but got %v", studentRes["identityNumber"], student.IdentityNumber))
+	}
+	if studentRes["gender"] != student.Gender {
+		t.Fatalf(fmt.Sprintf("student's gender  should be %v but got %v", studentRes["gender"], student.Gender))
+	}
+	if studentRes["major"] != student.Major {
+		t.Fatalf(fmt.Sprintf("student's major  should be %v but got %v", studentRes["major"], student.Major))
+	}
+	if studentRes["class"] != student.Class {
+		t.Fatalf(fmt.Sprintf("student's class  should be %v but got %v", studentRes["class"], student.Class))
+	}
+	if studentRes["religion"] != student.Religion {
+		t.Fatalf(fmt.Sprintf("student's religion  should be %v but got %v", studentRes["religion"], student.Religion))
+	}
 }
 
 func TestNotFoundPage(t *testing.T) {
