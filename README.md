@@ -34,15 +34,39 @@ Result e.g
       "statusCode":int,
       "message":string,
       "data":[
-        "id":string,
-        "name":string,
-        "identityNumber":int,
-        "gender":string,
-        "major":string,
-        "class":string,
-        "religion":string,
-        "createdAt":timestamp,
-        "updatedAt":timestamp
+         {
+          "id":string,
+          "name":string,
+          "identityNumber":int,
+          "gender":string,
+          "major":string,
+          "class":string,
+          "religion":string,
+          "createdAt":timestamp,
+          "updatedAt":timestamp
+         }
       ]
     }
 ```
+
+### Get Student By ID
+``` bash
+GET api/v1/students/:id
+Result e.g 
+    {
+        "statusCode":int,
+        "message":string,
+        "data":{
+            "id":string,
+            "name":string,
+            "identityNumber":int,
+            "gender":string,
+            "major":string,
+            "class":string,
+            "religion":string,
+            "createdAt":timestamp,
+            "updatedAt":timestamp
+        }
+    }
+```
+
