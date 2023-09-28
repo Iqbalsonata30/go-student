@@ -9,4 +9,5 @@ import (
 type StudentService interface {
 	Create(context.Context, web.StudentRequest) (*web.CreateStudentResponse, error)
 	FindAll(context.Context) ([]web.StudentResponse, error)
+	FindById(context.Context, string) (*web.StudentResponse, error)
 }

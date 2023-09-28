@@ -50,3 +50,18 @@ func (c *StudentControllerImpl) FindAll(w http.ResponseWriter, r *http.Request, 
 	helper.JSONEncode(w, http.StatusOK, res)
 
 }
+
+func (c *StudentControllerImpl) FindById(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id := ps.ByName("id")
+	student, err := c.Service.FindById(r.Context(), id)
+	if err != nil {
+		exception.ErrorHandler(w, r, err)
+		return
+	}
+	res := web.ApiResponse{
+		StatusCode: http.StatusOK,
+		Message:    "Success get data student",
+		Data:       student,
+	}
+	helper.JSONEncode(w, http.StatusOK, res)
+}

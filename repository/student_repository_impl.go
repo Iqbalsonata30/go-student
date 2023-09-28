@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"errors"
+
 	"github.com/google/uuid"
 	"github.com/iqbalsonata30/go-student/model/domain"
 )
@@ -45,4 +47,23 @@ func (r *StudentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) ([]doma
 
 	return students, nil
 
+}
+
+func (r *StudentRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id uuid.UUID) (*domain.Student, error) {
+	query := `SELECT id,name,identity_number,gender,major,class,religion,created_at,updated_at from student WHERE id = $1`
+	rows, err := tx.QueryContext(ctx, query, id)
+	if err != nil {
+		return nil, err
+	}
+
+	var student domain.Student
+	if rows.Next() {
+		err := rows.Scan(&student.ID, &student.Name, &student.IdentityNumber, &student.Gender, &student.Major, &student.Class, &student.Religion, &student.CreatedAt, &student.UpdatedAt)
+		if err != nil {
+			return nil, err
+		}
+		return &student, nil
+	} else {
+		return nil, errors.New("student is not found.")
+	}
 }

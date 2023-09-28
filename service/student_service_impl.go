@@ -5,6 +5,8 @@ import (
 	"database/sql"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
+	"github.com/iqbalsonata30/go-student/exception"
 	"github.com/iqbalsonata30/go-student/helper"
 	"github.com/iqbalsonata30/go-student/model/domain"
 	"github.com/iqbalsonata30/go-student/model/web"
@@ -68,4 +70,25 @@ func (s *StudentServiceImpl) FindAll(ctx context.Context) ([]web.StudentResponse
 	}
 	return helper.EntityToResponses(res), nil
 
+}
+
+func (s *StudentServiceImpl) FindById(ctx context.Context, id string) (*web.StudentResponse, error) {
+	tx, err := s.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+	sID, err := uuid.Parse(id)
+	if err != nil {
+		exception.NewNotFoundError("the id is not valid")
+	}
+	res, err := s.Repository.FindById(ctx, tx, sID)
+	if err != nil {
+		tx.Rollback()
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return helper.EntityToResponse(res), nil
 }
