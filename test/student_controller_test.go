@@ -50,12 +50,13 @@ func TruncateDB(db *sql.DB) {
 	db.Exec("truncate student;")
 }
 
-func TestCreateStudentSuccess(t *testing.T) {
-	db := SetupPostgresql()
-	TruncateDB(db)
-	router := SetupNewRouter(db)
+func TestCreateStudent(t *testing.T) {
+	t.Run("create student success", func(t *testing.T) {
+		db := SetupPostgresql()
+		TruncateDB(db)
+		router := SetupNewRouter(db)
 
-	reqBody := strings.NewReader(`{   
+		reqBody := strings.NewReader(`{   
         "name":"Iqbal Sonata",
         "identityNumber":2110127263323,
         "gender":"Male",
@@ -63,59 +64,59 @@ func TestCreateStudentSuccess(t *testing.T) {
         "class":"3-PTK-1",
         "religion":"Islam"
     }`)
-	req := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/students", reqBody)
-	rec := httptest.NewRecorder()
-	router.ServeHTTP(rec, req)
+		req := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/students", reqBody)
+		rec := httptest.NewRecorder()
+		router.ServeHTTP(rec, req)
 
-	res := rec.Result()
-	if res.Status != "201 Created" {
-		t.Fatalf("the status code should've 201 Created but got : %v", res.Status)
-	}
-	body, _ := io.ReadAll(res.Body)
-	var resBody map[string]any
-	json.Unmarshal(body, &resBody)
-
-	if int(resBody["statusCode"].(float64)) != 201 {
-		t.Fatalf("the status code should've 201 but got : %d", int(resBody["statusCode"].(float64)))
-	}
-	if resBody["message"] != "Student has been added succesfully" {
-		t.Fatalf(`message should've "Student has been added succesfully" but got : %v`, resBody["message"])
-	}
-	if resBody["data"].(map[string]any)["id"] == uuid.Invalid.String() {
-		t.Fatal("the id is not valid")
-	}
-}
-
-func TestCreateStudent_WithValidationRequired(t *testing.T) {
-	db := SetupPostgresql()
-	TruncateDB(db)
-	router := SetupNewRouter(db)
-
-	reqBody := strings.NewReader(`{}`)
-
-	req := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/students", reqBody)
-	rec := httptest.NewRecorder()
-
-	router.ServeHTTP(rec, req)
-	res := rec.Result()
-	if res.Status != "400 Bad Request" {
-		t.Fatalf("status code should've  400 Bad Request but got : %v", res.Status)
-	}
-
-	body, _ := io.ReadAll(res.Body)
-	var resBody map[string]any
-	json.Unmarshal(body, &resBody)
-
-	if int(resBody["statusCode"].(float64)) != 400 {
-		t.Fatalf("status code should've  400 but got : %v", int(resBody["statusCode"].(float64)))
-	}
-
-	for _, v := range resBody["error"].([]any) {
-		if v.(map[string]any)["message"] != "this field is required" {
-			t.Fatalf("the validation should be this fields is required but got : %v", v.(map[string]any)["message"])
+		res := rec.Result()
+		if res.Status != "201 Created" {
+			t.Fatalf("the status code should've 201 Created but got : %v", res.Status)
 		}
-	}
+		body, _ := io.ReadAll(res.Body)
+		var resBody map[string]any
+		json.Unmarshal(body, &resBody)
 
+		if int(resBody["statusCode"].(float64)) != 201 {
+			t.Fatalf("the status code should've 201 but got : %d", int(resBody["statusCode"].(float64)))
+		}
+		if resBody["message"] != "Student has been added succesfully" {
+			t.Fatalf(`message should've "Student has been added succesfully" but got : %v`, resBody["message"])
+		}
+		if resBody["data"].(map[string]any)["id"] == uuid.Invalid.String() {
+			t.Fatal("the id is not valid")
+		}
+	})
+	t.Run("create student with validation required", func(t *testing.T) {
+		db := SetupPostgresql()
+		TruncateDB(db)
+		router := SetupNewRouter(db)
+
+		reqBody := strings.NewReader(`{}`)
+
+		req := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/students", reqBody)
+		rec := httptest.NewRecorder()
+
+		router.ServeHTTP(rec, req)
+		res := rec.Result()
+		if res.Status != "400 Bad Request" {
+			t.Fatalf("status code should've  400 Bad Request but got : %v", res.Status)
+		}
+
+		body, _ := io.ReadAll(res.Body)
+		var resBody map[string]any
+		json.Unmarshal(body, &resBody)
+
+		if int(resBody["statusCode"].(float64)) != 400 {
+			t.Fatalf("status code should've  400 but got : %v", int(resBody["statusCode"].(float64)))
+		}
+
+		for _, v := range resBody["error"].([]any) {
+			if v.(map[string]any)["message"] != "this field is required" {
+				t.Fatalf("the validation should be this fields is required but got : %v", v.(map[string]any)["message"])
+			}
+		}
+
+	})
 }
 
 func TestGetAllStudents(t *testing.T) {
