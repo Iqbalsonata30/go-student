@@ -13,5 +13,5 @@ type StudentRepository interface {
 	FindById(context.Context, *sql.Tx, uuid.UUID) (*domain.Student, error)
 	FindAll(context.Context, *sql.Tx) ([]domain.Student, error)
 	// Update(context.Context, *sql.Tx, string) (*domain.Student, error)
-	// Delete(context.Context, *sql.Tx, string) error
+	DeleteById(context.Context, *sql.Tx, uuid.UUID) error
 }

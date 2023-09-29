@@ -171,6 +171,65 @@ func TestGetAllStudents(t *testing.T) {
 	}
 }
 
+func TestFindStudentByID(t *testing.T) {
+	t.Run("find by id succesfully", func(t *testing.T) {
+		db := SetupPostgresql()
+		TruncateDB(db)
+		router := SetupNewRouter(db)
+		tx, _ := db.Begin()
+		studentRepository := repository.NewRepositoryStudent()
+		student, _ := studentRepository.Save(context.Background(), tx, domain.Student{
+			Name:           "test",
+			IdentityNumber: 2122,
+			Gender:         "male",
+			Major:          "test",
+			Class:          "test",
+			Religion:       "test",
+		})
+		tx.Commit()
+		req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:3000/api/v1/students/%v", student.ID), nil)
+		rec := httptest.NewRecorder()
+		router.ServeHTTP(rec, req)
+		res := rec.Result()
+		if res.StatusCode != 200 {
+			t.Fatalf("the status code should've 200 but got : %d", res.StatusCode)
+		}
+		body, _ := io.ReadAll(res.Body)
+		var resBody map[string]any
+		json.Unmarshal(body, &resBody)
+
+		if resBody["message"] != "Success get data student" {
+			t.Fatalf("message should be Success get data students but got : %v", resBody["message"])
+		}
+		if ok := json.Valid([]byte(body)); !ok {
+			t.Fatal("the result data is not valid json")
+		}
+	})
+
+	t.Run("find by id is not found", func(t *testing.T) {
+		db := SetupPostgresql()
+		TruncateDB(db)
+		router := SetupNewRouter(db)
+		req := httptest.NewRequest(http.MethodGet, "http://localhost:3000/api/v1/students/asda", nil)
+		rec := httptest.NewRecorder()
+		router.ServeHTTP(rec, req)
+		res := rec.Result()
+		if res.StatusCode != 404 {
+			t.Fatalf("the status code should've 404 but got : %d", res.StatusCode)
+		}
+		body, _ := io.ReadAll(res.Body)
+		var resBody map[string]any
+		json.Unmarshal(body, &resBody)
+
+		if resBody["error"] != "student is not found." {
+			t.Fatalf("message should be Success get data students but got : %v", resBody["message"])
+		}
+		if ok := json.Valid([]byte(body)); !ok {
+			t.Fatal("the result data is not valid json")
+		}
+	})
+}
+
 func TestNotFoundPage(t *testing.T) {
 	db := SetupPostgresql()
 	TruncateDB(db)

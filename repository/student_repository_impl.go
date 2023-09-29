@@ -67,3 +67,11 @@ func (r *StudentRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, id uui
 		return nil, errors.New("student is not found.")
 	}
 }
+func (r *StudentRepositoryImpl) DeleteById(ctx context.Context, tx *sql.Tx, id uuid.UUID) error {
+	query := `DELETE FROM student where id = $1;`
+	_, err := tx.ExecContext(ctx, query, id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
