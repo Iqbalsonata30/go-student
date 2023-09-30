@@ -69,4 +69,27 @@ Result e.g
         }
     }
 ```
+### Update Student By ID
+``` bash
+PUT api/v1/students/:id
+Request e.g
+  {   
+    "name":string,       
+    "identityNumber":int,
+    "gender":string,
+    "major":string,
+    "class":string,
+    "religion":string
+  }
+```
+### Delete Student By ID 
+``` bash
+DELETE api/v1/students/:id
+Result e.g
+ {
+     "statusCode":int,
+     "message":string,
+     "data":string
+```
+
 
