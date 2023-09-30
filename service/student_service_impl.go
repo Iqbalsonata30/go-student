@@ -79,7 +79,7 @@ func (s *StudentServiceImpl) FindById(ctx context.Context, id string) (*web.Stud
 	}
 	sID, err := uuid.Parse(id)
 	if err != nil {
-		exception.NewNotFoundError("the id is not valid")
+		panic(exception.NewNotFoundError("the id is not valid"))
 	}
 	res, err := s.Repository.FindById(ctx, tx, sID)
 	if err != nil {
@@ -91,4 +91,25 @@ func (s *StudentServiceImpl) FindById(ctx context.Context, id string) (*web.Stud
 	}
 
 	return helper.EntityToResponse(res), nil
+}
+
+func (s *StudentServiceImpl) DeleteById(ctx context.Context, id string) error {
+	tx, err := s.DB.Begin()
+	if err != nil {
+		return err
+	}
+	sID, err := uuid.Parse(id)
+	if err != nil {
+		panic(exception.NewNotFoundError("Invalid student id"))
+	}
+	err = s.Repository.DeleteById(ctx, tx, sID)
+	if err != nil {
+		tx.Rollback()
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+	if err := tx.Commit(); err != nil {
+		return err
+	}
+
+	return nil
 }

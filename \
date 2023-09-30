@@ -71,11 +71,7 @@ func (c *StudentControllerImpl) DeleteById(w http.ResponseWriter, r *http.Reques
 	if err != nil {
 		exception.ErrorHandler(w, r, err)
 		return
+
 	}
-	res := web.ApiResponse{
-		StatusCode: http.StatusOK,
-		Message:    "Success delete the student",
-		Data:       id,
-	}
-	helper.JSONEncode(w, http.StatusOK, res)
+
 }
