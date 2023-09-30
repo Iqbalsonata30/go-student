@@ -206,7 +206,7 @@ func TestFindStudentByID(t *testing.T) {
 		}
 	})
 
-	t.Run("find by id is not found", func(t *testing.T) {
+	t.Run("find by id invalid uuid", func(t *testing.T) {
 		db := SetupPostgresql()
 		TruncateDB(db)
 		router := SetupNewRouter(db)
@@ -221,8 +221,31 @@ func TestFindStudentByID(t *testing.T) {
 		var resBody map[string]any
 		json.Unmarshal(body, &resBody)
 
+		if resBody["error"] != "Invalid student id" {
+			t.Fatalf("message should be Success get data students but got : %v", resBody["error"])
+		}
+		if ok := json.Valid([]byte(body)); !ok {
+			t.Fatal("the result data is not valid json")
+		}
+	})
+
+	t.Run("find by id not found", func(t *testing.T) {
+		db := SetupPostgresql()
+		TruncateDB(db)
+		router := SetupNewRouter(db)
+		req := httptest.NewRequest(http.MethodGet, "http://localhost:3000/api/v1/students/22a5f8df-0460-4fa8-9db3-95cac91f6f86", nil)
+		rec := httptest.NewRecorder()
+		router.ServeHTTP(rec, req)
+		res := rec.Result()
+		if res.StatusCode != 404 {
+			t.Fatalf("the status code should've 404 but got : %d", res.StatusCode)
+		}
+		body, _ := io.ReadAll(res.Body)
+		var resBody map[string]any
+		json.Unmarshal(body, &resBody)
+
 		if resBody["error"] != "student is not found." {
-			t.Fatalf("message should be Success get data students but got : %v", resBody["message"])
+			t.Fatalf("message should be Success get data students but got : %v", resBody["error"])
 		}
 		if ok := json.Valid([]byte(body)); !ok {
 			t.Fatal("the result data is not valid json")

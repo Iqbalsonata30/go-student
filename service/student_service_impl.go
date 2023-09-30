@@ -79,7 +79,7 @@ func (s *StudentServiceImpl) FindById(ctx context.Context, id string) (*web.Stud
 	}
 	sID, err := uuid.Parse(id)
 	if err != nil {
-		panic(exception.NewNotFoundError("the id is not valid"))
+		panic(exception.NewNotFoundError("Invalid student id"))
 	}
 	res, err := s.Repository.FindById(ctx, tx, sID)
 	if err != nil {
