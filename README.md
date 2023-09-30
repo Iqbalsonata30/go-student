@@ -90,6 +90,7 @@ Result e.g
      "statusCode":int,
      "message":string,
      "data":string
+ }
 ```
 
 
