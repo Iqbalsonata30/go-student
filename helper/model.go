@@ -27,7 +27,8 @@ func EntityToResponse(student *domain.Student) *web.StudentResponse {
 }
 
 func EntityToResponses(students []domain.Student) []web.StudentResponse {
-	var studentResponses []web.StudentResponse
+	studentResponses := make([]web.StudentResponse, 0)
+
 	for _, student := range students {
 		studentResponses = append(studentResponses, *EntityToResponse(&student))
 	}

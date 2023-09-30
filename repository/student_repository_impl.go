@@ -44,7 +44,6 @@ func (r *StudentRepositoryImpl) FindAll(ctx context.Context, tx *sql.Tx) ([]doma
 		students = append(students, student)
 	}
 	defer rows.Close()
-
 	return students, nil
 
 }
