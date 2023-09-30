@@ -13,6 +13,7 @@ func NewRouter(controller controller.StudentController) *httprouter.Router {
 	router.GET("/api/v1/students", controller.FindAll)
 	router.GET("/api/v1/students/:id", controller.FindById)
 	router.DELETE("/api/v1/students/:id", controller.DeleteById)
+	router.PUT("/api/v1/students/:id", controller.UpdateById)
 
 	router.NotFound = exception.NotFoundPage()
 	router.PanicHandler = exception.ErrorHandler

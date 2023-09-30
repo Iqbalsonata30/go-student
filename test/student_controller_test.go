@@ -253,6 +253,10 @@ func TestFindStudentByID(t *testing.T) {
 	})
 }
 
+func TestDeleteStudentById(t *testing.T) {
+
+}
+
 func TestNotFoundPage(t *testing.T) {
 	db := SetupPostgresql()
 	TruncateDB(db)

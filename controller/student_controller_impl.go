@@ -79,3 +79,21 @@ func (c *StudentControllerImpl) DeleteById(w http.ResponseWriter, r *http.Reques
 	}
 	helper.JSONEncode(w, http.StatusOK, res)
 }
+
+func (c *StudentControllerImpl) UpdateById(w http.ResponseWriter, r *http.Request, ps httprouter.Params) {
+	id := ps.ByName("id")
+	req := web.StudentRequest{}
+	helper.BodyRequest(r, &req)
+	student, err := c.Service.UpdateById(r.Context(), id, req)
+	if err != nil {
+		exception.ErrorHandler(w, r, err)
+		return
+	}
+	res := web.ApiResponse{
+		StatusCode: http.StatusOK,
+		Message:    "Success update student",
+		Data:       student,
+	}
+	helper.JSONEncode(w, http.StatusOK, res)
+
+}

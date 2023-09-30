@@ -15,6 +15,9 @@ func ErrorHandler(w http.ResponseWriter, r *http.Request, err any) {
 	if validationError(w, r, err) {
 		return
 	}
+	if badRequestError(w, r, err) {
+		return
+	}
 
 	internalError(w, r, err)
 }
@@ -39,16 +42,28 @@ func validationError(w http.ResponseWriter, r *http.Request, err any) bool {
 
 func notFoundError(w http.ResponseWriter, r *http.Request, err any) bool {
 	exception, ok := err.(NotFoundError)
-	if ok {
-		apiResp := web.ApiError{
-			StatusCode: http.StatusNotFound,
-			Error:      exception.Error,
-		}
-		helper.JSONEncode(w, http.StatusNotFound, apiResp)
-		return true
-	} else {
+	if !ok {
 		return false
 	}
+	apiResp := web.ApiError{
+		StatusCode: http.StatusNotFound,
+		Error:      exception.Error,
+	}
+	helper.JSONEncode(w, http.StatusNotFound, apiResp)
+	return true
+}
+
+func badRequestError(w http.ResponseWriter, r *http.Request, err any) bool {
+	exception, ok := err.(BadRequestError)
+	if !ok {
+		return false
+	}
+	apiResp := web.ApiError{
+		StatusCode: http.StatusBadRequest,
+		Error:      exception.Error,
+	}
+	helper.JSONEncode(w, http.StatusBadRequest, apiResp)
+	return true
 
 }
 

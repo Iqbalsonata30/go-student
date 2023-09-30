@@ -79,7 +79,7 @@ func (s *StudentServiceImpl) FindById(ctx context.Context, id string) (*web.Stud
 	}
 	sID, err := uuid.Parse(id)
 	if err != nil {
-		panic(exception.NewNotFoundError("Invalid student id"))
+		panic(exception.NewBadRequestError("Invalid student id"))
 	}
 	res, err := s.Repository.FindById(ctx, tx, sID)
 	if err != nil {
@@ -100,7 +100,7 @@ func (s *StudentServiceImpl) DeleteById(ctx context.Context, id string) error {
 	}
 	sID, err := uuid.Parse(id)
 	if err != nil {
-		panic(exception.NewNotFoundError("Invalid student id"))
+		panic(exception.NewBadRequestError("Invalid student id"))
 	}
 	err = s.Repository.DeleteById(ctx, tx, sID)
 	if err != nil {
@@ -112,4 +112,41 @@ func (s *StudentServiceImpl) DeleteById(ctx context.Context, id string) error {
 	}
 
 	return nil
+
+}
+
+func (s *StudentServiceImpl) UpdateById(ctx context.Context, id string, req web.StudentRequest) (*web.StudentResponse, error) {
+	err := s.Validate.Struct(req)
+	if err != nil {
+		return nil, err
+	}
+	tx, err := s.DB.Begin()
+	if err != nil {
+		return nil, err
+	}
+	student := domain.Student{
+		Name:           req.Name,
+		IdentityNumber: req.IdentityNumber,
+		Gender:         req.Gender,
+		Major:          req.Major,
+		Class:          req.Class,
+		Religion:       req.Religion,
+	}
+
+	sID, err := uuid.Parse(id)
+	if err != nil {
+		panic(exception.NewBadRequestError("Invalid student id"))
+	}
+
+	res, err := s.Repository.UpdateById(ctx, tx, sID, student)
+	if err != nil {
+		tx.Rollback()
+		panic(exception.NewNotFoundError(err.Error()))
+	}
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
+
+	return helper.EntityToResponse(res), nil
+
 }

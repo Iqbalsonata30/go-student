@@ -11,4 +11,5 @@ type StudentController interface {
 	FindAll(http.ResponseWriter, *http.Request, httprouter.Params)
 	FindById(http.ResponseWriter, *http.Request, httprouter.Params)
 	DeleteById(http.ResponseWriter, *http.Request, httprouter.Params)
+	UpdateById(http.ResponseWriter, *http.Request, httprouter.Params)
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/iqbalsonata30/go-student/model/domain"
@@ -80,4 +81,23 @@ func (r *StudentRepositoryImpl) DeleteById(ctx context.Context, tx *sql.Tx, id u
 		return errors.New("student is not found")
 	}
 	return nil
+}
+
+func (r *StudentRepositoryImpl) UpdateById(ctx context.Context, tx *sql.Tx, id uuid.UUID, student domain.Student) (*domain.Student, error) {
+	query := `UPDATE student SET name = $1,identity_number = $2,gender = $3, major = $4, class = $5,religion = $6,updated_at = $7 where id = $8;`
+	res, err := tx.ExecContext(ctx, query, student.Name, student.IdentityNumber, student.Gender, student.Major, student.Class, student.Religion, time.Now().UTC(), id)
+	if err != nil {
+		return nil, err
+	}
+	row, err := res.RowsAffected()
+	if err != nil {
+		return nil, err
+	}
+	if row < 1 {
+		return nil, errors.New("student is not found.")
+	}
+	student.ID = id
+	student.UpdatedAt = time.Now().UTC()
+	return &student, nil
+
 }

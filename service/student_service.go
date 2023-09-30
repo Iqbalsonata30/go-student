@@ -11,4 +11,5 @@ type StudentService interface {
 	FindAll(context.Context) ([]web.StudentResponse, error)
 	FindById(context.Context, string) (*web.StudentResponse, error)
 	DeleteById(context.Context, string) error
+	UpdateById(context.Context, string, web.StudentRequest) (*web.StudentResponse, error)
 }
