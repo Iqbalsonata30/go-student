@@ -214,8 +214,8 @@ func TestFindStudentByID(t *testing.T) {
 		rec := httptest.NewRecorder()
 		router.ServeHTTP(rec, req)
 		res := rec.Result()
-		if res.StatusCode != 404 {
-			t.Fatalf("the status code should've 404 but got : %d", res.StatusCode)
+		if res.StatusCode != 400 {
+			t.Fatalf("the status code should've 400 but got : %d", res.StatusCode)
 		}
 		body, _ := io.ReadAll(res.Body)
 		var resBody map[string]any
@@ -254,6 +254,35 @@ func TestFindStudentByID(t *testing.T) {
 }
 
 func TestDeleteStudentById(t *testing.T) {
+	t.Run("Delete student sucesfully", func(t *testing.T) {
+		db := SetupPostgresql()
+		router := SetupNewRouter(db)
+		tx, _ := db.Begin()
+		studentRepository := repository.NewRepositoryStudent()
+		student, _ := studentRepository.Save(context.Background(), tx, domain.Student{
+			Name:           "test",
+			IdentityNumber: 2122,
+			Gender:         "male",
+			Major:          "test",
+			Class:          "test",
+			Religion:       "test",
+		})
+		tx.Commit()
+		req := httptest.NewRequest("DELETE", fmt.Sprintf("http://localhost:3000/api/v1/students/%s", student.ID), nil)
+		rec := httptest.NewRecorder()
+		router.ServeHTTP(rec, req)
+		res := rec.Result()
+		if res.StatusCode != 200 {
+			t.Fatalf("status code should've 200 but got : %d", res.StatusCode)
+		}
+		body, _ := io.ReadAll(res.Body)
+		var resBody map[string]any
+		json.Unmarshal(body, &resBody)
+		if resBody["message"] != "Success delete the student" {
+			t.Fatalf("message is not valid, your message : %s", resBody["message"])
+
+		}
+	})
 
 }
 
