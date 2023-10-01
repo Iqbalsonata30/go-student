@@ -2,6 +2,8 @@ package app
 
 import (
 	"database/sql"
+	"fmt"
+	"os"
 
 	_ "github.com/lib/pq"
 )
@@ -11,7 +13,16 @@ type PostgresDB struct {
 }
 
 func NewPostgresDB() (*PostgresDB, error) {
-	connStr := "user=postgres  password=secret dbname=go_student sslmode=disable"
+	if os.Getenv("DB_USER") == "" {
+		return nil, fmt.Errorf("DB USER environment must be set")
+	}
+	if os.Getenv("DB_DATABASE") == "" {
+		return nil, fmt.Errorf("Database name environment must be set")
+	}
+	if os.Getenv("DB_PASSWORD") == "" {
+		return nil, fmt.Errorf("DB PASSWORD  environment must be set")
+	}
+	connStr := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_DATABASE"))
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, err

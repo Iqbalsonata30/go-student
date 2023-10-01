@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
 
@@ -21,7 +22,17 @@ import (
 )
 
 func SetupPostgresql() *sql.DB {
-	connStr := "user=postgres  password=secret dbname=go_student sslmode=disable"
+	if os.Getenv("DB_USER") == "" {
+		panic("DB USER environment must be set")
+	}
+	if os.Getenv("DB_DATABASE") == "" {
+		panic("Database name environment must be set")
+	}
+	if os.Getenv("DB_PASSWORD") == "" {
+		panic("DB PASSWORD  environment must be set")
+	}
+	connStr := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_DATABASE"))
+
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		panic(err)
@@ -329,6 +340,10 @@ func TestDeleteStudentById(t *testing.T) {
 			t.Fatal("the result data is not valid json")
 		}
 	})
+
+}
+
+func TestUpdateStudent(t *testing.T) {
 
 }
 
