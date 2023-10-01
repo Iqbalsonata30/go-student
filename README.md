@@ -11,6 +11,15 @@ Simple REST API that represents data of students. this project implements reposi
   </ul>
 </div>
 
+## Setup Environtment
+
+```bash
+export DB_HOST = ""
+export DB_PASSWORD = ""
+exprot DB_DATABASE = ""
+```
+
+
 ## Endpoints
 
 ### Create Student 
