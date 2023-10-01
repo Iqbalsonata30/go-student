@@ -268,7 +268,7 @@ func TestDeleteStudentById(t *testing.T) {
 			Religion:       "test",
 		})
 		tx.Commit()
-		req := httptest.NewRequest("DELETE", fmt.Sprintf("http://localhost:3000/api/v1/students/%s", student.ID), nil)
+		req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("http://localhost:3000/api/v1/students/%s", student.ID), nil)
 		rec := httptest.NewRecorder()
 		router.ServeHTTP(rec, req)
 		res := rec.Result()
@@ -281,6 +281,52 @@ func TestDeleteStudentById(t *testing.T) {
 		if resBody["message"] != "Success delete the student" {
 			t.Fatalf("message is not valid, your message : %s", resBody["message"])
 
+		}
+	})
+
+	t.Run("delete by id invalid uuid", func(t *testing.T) {
+		db := SetupPostgresql()
+		TruncateDB(db)
+		router := SetupNewRouter(db)
+		req := httptest.NewRequest(http.MethodDelete, "http://localhost:3000/api/v1/students/asda", nil)
+		rec := httptest.NewRecorder()
+		router.ServeHTTP(rec, req)
+		res := rec.Result()
+		if res.StatusCode != 400 {
+			t.Fatalf("the status code should've 400 but got : %d", res.StatusCode)
+		}
+		body, _ := io.ReadAll(res.Body)
+		var resBody map[string]any
+		json.Unmarshal(body, &resBody)
+
+		if resBody["error"] != "Invalid student id" {
+			t.Fatalf("message should be Success delete the  student but got : %v", resBody["error"])
+		}
+		if ok := json.Valid([]byte(body)); !ok {
+			t.Fatal("the result data is not valid json")
+		}
+	})
+
+	t.Run("student id is  not found", func(t *testing.T) {
+		db := SetupPostgresql()
+		TruncateDB(db)
+		router := SetupNewRouter(db)
+		req := httptest.NewRequest(http.MethodDelete, "http://localhost:3000/api/v1/students/22a5f8df-0460-4fa8-9db3-95cac91f6f86", nil)
+		rec := httptest.NewRecorder()
+		router.ServeHTTP(rec, req)
+		res := rec.Result()
+		if res.StatusCode != 404 {
+			t.Fatalf("the status code should've 404 but got : %d", res.StatusCode)
+		}
+		body, _ := io.ReadAll(res.Body)
+		var resBody map[string]any
+		json.Unmarshal(body, &resBody)
+
+		if resBody["error"] != "student is not found" {
+			t.Fatalf("message should be Success delete the student but got : %v", resBody["error"])
+		}
+		if ok := json.Valid([]byte(body)); !ok {
+			t.Fatal("the result data is not valid json")
 		}
 	})
 
