@@ -17,6 +17,8 @@ Simple REST API that represents data of students. this project implements reposi
 export DB_HOST = ""
 export DB_PASSWORD = ""
 export DB_DATABASE = ""
+export DB_PORT = ""
+export DB_USER = ""
 ```
 
 

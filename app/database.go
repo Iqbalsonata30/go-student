@@ -19,10 +19,16 @@ func NewPostgresDB() (*PostgresDB, error) {
 	if os.Getenv("DB_DATABASE") == "" {
 		return nil, fmt.Errorf("Database name environment must be set")
 	}
+	if os.Getenv("DB_HOST") == "" {
+		return nil, fmt.Errorf("DB Host environment must be set")
+	}
+	if os.Getenv("DB_PORT") == "" {
+		return nil, fmt.Errorf("DB Port name environment must be set")
+	}
 	if os.Getenv("DB_PASSWORD") == "" {
 		return nil, fmt.Errorf("DB PASSWORD  environment must be set")
 	}
-	connStr := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_DATABASE"))
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_DATABASE"))
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		return nil, err
