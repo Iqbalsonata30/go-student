@@ -4,6 +4,8 @@ WORKDIR  /app
 
 COPY . .
 
+RUN go test -v ./test
+
 RUN go build -o ./bin/go-student
 
 EXPOSE 3000

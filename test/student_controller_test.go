@@ -28,10 +28,16 @@ func SetupPostgresql() *sql.DB {
 	if os.Getenv("DB_DATABASE") == "" {
 		panic("Database name environment must be set")
 	}
+	if os.Getenv("DB_HOST") == "" {
+		panic("DB Host environment must be set")
+	}
+	if os.Getenv("DB_PORT") == "" {
+		panic("DB Port name environment must be set")
+	}
 	if os.Getenv("DB_PASSWORD") == "" {
 		panic("DB PASSWORD  environment must be set")
 	}
-	connStr := fmt.Sprintf("user=%s password=%s dbname=%s sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_DATABASE"))
+	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s?sslmode=disable", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), os.Getenv("DB_DATABASE"))
 
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
