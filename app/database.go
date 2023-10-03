@@ -42,6 +42,16 @@ func NewPostgresDB() (*PostgresDB, error) {
 }
 
 func (s *PostgresDB) Init() error {
+	if err := s.createTableUser(); err != nil {
+		return err
+	}
+	if err := s.createTableStudent(); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *PostgresDB) createTableStudent() error {
 	query := `CREATE TABLE IF NOT EXISTS student(
             id uuid PRIMARY KEY,
             name varchar(100) NOT NULL,
@@ -58,4 +68,18 @@ func (s *PostgresDB) Init() error {
 		return err
 	}
 	return nil
+}
+
+func (s *PostgresDB) createTableUser() error {
+	query := `CREATE TABLE IF NOT EXISTS user_login_info(
+      id UUID PRIMARY KEY,
+      username varchar(100) NOT NULL,
+      password varchar(255) NOT NULL;
+  )`
+	_, err := s.DB.Exec(query)
+	if err != nil {
+		return err
+	}
+
+	return err
 }
