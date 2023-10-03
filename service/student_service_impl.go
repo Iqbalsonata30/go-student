@@ -52,7 +52,7 @@ func (s *StudentServiceImpl) Create(ctx context.Context, req web.StudentRequest)
 	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
-	return helper.EntityToCreateResponse(res), nil
+	return helper.EntityToCreateStudentResponse(res), nil
 }
 
 func (s *StudentServiceImpl) FindAll(ctx context.Context) ([]web.StudentResponse, error) {

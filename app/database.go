@@ -71,9 +71,9 @@ func (s *PostgresDB) createTableStudent() error {
 }
 
 func (s *PostgresDB) createTableUser() error {
-	query := `CREATE TABLE IF NOT EXISTS user_login_info(
+	query := `CREATE TABLE IF NOT EXISTS user_account(
       id UUID PRIMARY KEY,
-      username varchar(100) NOT NULL,
+      username varchar(100) UNIQUE NOT NULL,
       password varchar(255) NOT NULL
     );`
 	_, err := s.DB.Exec(query)

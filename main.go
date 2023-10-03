@@ -20,10 +20,15 @@ func main() {
 		log.Fatal(err)
 	}
 	validate := validator.New(validator.WithRequiredStructEnabled())
-	repository := repository.NewRepositoryStudent()
-	service := service.NewStudentService(repository, store.DB, validate)
-	controller := controller.NewStudentContoller(service)
-	router := app.NewRouter(controller)
+	studentRepository := repository.NewRepositoryStudent()
+	studentService := service.NewStudentService(studentRepository, store.DB, validate)
+	studentController := controller.NewStudentContoller(studentService)
+
+	userRepository := repository.NewUserRepository()
+	userService := service.NewUserService(userRepository, store.DB)
+	userController := controller.NewUserController(userService)
+
+	router := app.NewRouter(studentController, userController)
 
 	log.Println("server running on port:3000")
 	log.Fatal(http.ListenAndServe(":3000", router))

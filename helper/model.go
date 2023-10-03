@@ -5,10 +5,16 @@ import (
 	"github.com/iqbalsonata30/go-student/model/web"
 )
 
-func EntityToCreateResponse(student *domain.Student) *web.CreateStudentResponse {
+func EntityToCreateStudentResponse(student *domain.Student) *web.CreateStudentResponse {
 	return &web.CreateStudentResponse{
 		ID: student.ID,
 	}
+}
+func EntityToCreateUserResponse(user *domain.User) *web.CreateUserResponse {
+	return &web.CreateUserResponse{
+		ID: user.ID,
+	}
+
 }
 
 func EntityToResponse(student *domain.Student) *web.StudentResponse {
