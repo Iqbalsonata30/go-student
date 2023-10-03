@@ -25,6 +25,16 @@ export DB_USER = ""
 
 ## Endpoints
 
+### Create User 
+```bash
+POST api/v1/users
+Request e.g 
+    {
+        "username":string,
+        "password":string,
+    }
+```
+
 ### Create Student 
 ``` bash
 POST api/v1/students
