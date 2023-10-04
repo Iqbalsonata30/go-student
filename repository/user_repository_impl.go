@@ -5,6 +5,7 @@ import (
 	"database/sql"
 
 	"github.com/google/uuid"
+	"github.com/iqbalsonata30/go-student/helper"
 	"github.com/iqbalsonata30/go-student/model/domain"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -19,7 +20,7 @@ func NewUserRepository() UserRepository {
 
 func (r *UserRepositoryImpl) Save(ctx context.Context, db *sql.Tx, req domain.User) (*domain.User, error) {
 	query := `INSERT INTO user_account(id,username,password) VALUES($1,$2,$3);`
-	saltedPassword, err := r.hashAndSalt([]byte(req.Password))
+	saltedPassword, err := helper.HashAndSalted([]byte(req.Password))
 	if err != nil {
 		return nil, bcrypt.ErrPasswordTooLong
 	}
@@ -30,12 +31,4 @@ func (r *UserRepositoryImpl) Save(ctx context.Context, db *sql.Tx, req domain.Us
 	}
 	req.ID = id
 	return &req, nil
-}
-
-func (r *UserRepositoryImpl) hashAndSalt(pw []byte) ([]byte, error) {
-	hash, err := bcrypt.GenerateFromPassword(pw, bcrypt.DefaultCost)
-	if err != nil {
-		return nil, err
-	}
-	return hash, err
 }
