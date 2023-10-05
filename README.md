@@ -9,7 +9,7 @@ Simple REST API that represents data of students. this project implements reposi
     <li><a href="https://github.com/julienschmidt/httprouter">httprouter</a> - HTTP Request Router </li>
     <li><a href="https://github.com/go-playground/validator">validator</a> - Golang Validator</li>
     <li><a href="https://www.docker.com/">docker</a> - Docker</li>
-    <li><a href="github.com/golang-jwt/jwt/v5 ">go-jwt</a> - Golang JSON Web Token</li>
+    <li><a href="https:///www.github.com/golang-jwt/jwt/v5 ">go-jwt</a> - Golang JSON Web Token</li>
   </ul>
 </div>
 
