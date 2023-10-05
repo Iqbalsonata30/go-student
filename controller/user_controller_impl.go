@@ -35,3 +35,20 @@ func (c *UserControllerImpl) Create(w http.ResponseWriter, r *http.Request, _ ht
 	}
 	helper.JSONEncode(w, http.StatusCreated, apiResp)
 }
+
+func (c *UserControllerImpl) Login(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	req := web.UserRequest{}
+	helper.BodyRequest(r, &req)
+	res, err := c.service.Authenticate(r.Context(), req)
+	if err != nil {
+		exception.ErrorHandler(w, r, err)
+		return
+	}
+	apiResp := web.ApiResponse{
+		StatusCode: http.StatusOK,
+		Message:    "Succesfully authenticated user",
+		Data:       res,
+	}
+	helper.JSONEncode(w, http.StatusOK, apiResp)
+
+}

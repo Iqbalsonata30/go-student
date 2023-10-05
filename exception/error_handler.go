@@ -18,6 +18,9 @@ func ErrorHandler(w http.ResponseWriter, r *http.Request, err any) {
 	if badRequestError(w, r, err) {
 		return
 	}
+	if unauthorizedError(w, r, err) {
+		return
+	}
 
 	internalError(w, r, err)
 }
@@ -65,6 +68,19 @@ func badRequestError(w http.ResponseWriter, r *http.Request, err any) bool {
 	helper.JSONEncode(w, http.StatusBadRequest, apiResp)
 	return true
 
+}
+
+func unauthorizedError(w http.ResponseWriter, r *http.Request, err any) bool {
+	exception, ok := err.(UnauthorizedError)
+	if !ok {
+		return false
+	}
+	apiResp := web.ApiError{
+		StatusCode: http.StatusUnauthorized,
+		Error:      exception.Error,
+	}
+	helper.JSONEncode(w, http.StatusUnauthorized, apiResp)
+	return true
 }
 
 func internalError(w http.ResponseWriter, r *http.Request, err any) {

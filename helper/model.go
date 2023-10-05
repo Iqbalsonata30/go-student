@@ -14,6 +14,12 @@ func EntityToCreateUserResponse(user *domain.User) *web.CreateUserResponse {
 	return &web.CreateUserResponse{
 		ID: user.ID,
 	}
+}
+func EntityToUserLoginResponse(user *domain.User, token string) *web.UserLoginResponse {
+	return &web.UserLoginResponse{
+		Username: user.Username,
+		Token:    token,
+	}
 
 }
 
