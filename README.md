@@ -9,6 +9,7 @@ Simple REST API that represents data of students. this project implements reposi
     <li><a href="https://github.com/julienschmidt/httprouter">httprouter</a> - HTTP Request Router </li>
     <li><a href="https://github.com/go-playground/validator">validator</a> - Golang Validator</li>
     <li><a href="https://www.docker.com/">docker</a> - Docker</li>
+    <li><a href="github.com/golang-jwt/jwt/v5 ">go-jwt</a> - Golang JSON Web Token</li>
   </ul>
 </div>
 
@@ -28,6 +29,15 @@ export DB_USER = ""
 ### Create User 
 ```bash
 POST api/v1/users
+Request e.g 
+    {
+        "username":string,
+        "password":string,
+    }
+```
+### Login 
+```bash
+POST api/v1/login
 Request e.g 
     {
         "username":string,
