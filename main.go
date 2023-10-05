@@ -30,6 +30,10 @@ func main() {
 
 	router := app.NewRouter(studentController, userController)
 
-	log.Println("server running on port:3000")
-	log.Fatal(http.ListenAndServe(":3000", router))
+	server := http.Server{
+		Addr:    ":3000",
+		Handler: router,
+	}
+	log.Printf("server running on port %s\n", server.Addr)
+	log.Fatal(server.ListenAndServe())
 }

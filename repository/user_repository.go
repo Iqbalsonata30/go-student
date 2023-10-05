@@ -9,4 +9,5 @@ import (
 
 type UserRepository interface {
 	Save(context.Context, *sql.Tx, domain.User) (*domain.User, error)
+	Authenticate(context.Context, *sql.Tx, domain.User) (*domain.User, error)
 }

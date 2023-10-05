@@ -8,4 +8,5 @@ import (
 
 type UserService interface {
 	Create(context.Context, web.UserRequest) (*web.CreateUserResponse, error)
+	Authenticate(context.Context, web.UserRequest) (*web.UserLoginResponse, error)
 }
