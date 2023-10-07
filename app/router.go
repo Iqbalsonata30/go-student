@@ -2,11 +2,9 @@ package app
 
 import (
 	"database/sql"
-	"fmt"
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/iqbalsonata30/go-student/controller"
 	"github.com/iqbalsonata30/go-student/exception"
 	"github.com/iqbalsonata30/go-student/helper"
