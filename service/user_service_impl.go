@@ -3,11 +3,7 @@ package service
 import (
 	"context"
 	"database/sql"
-	"fmt"
-	"os"
-	"time"
 
-	"github.com/golang-jwt/jwt/v5"
 	"github.com/iqbalsonata30/go-student/exception"
 	"github.com/iqbalsonata30/go-student/helper"
 	"github.com/iqbalsonata30/go-student/model/domain"
@@ -64,20 +60,9 @@ func (s *UserServiceImpl) Authenticate(ctx context.Context, user web.UserRequest
 	if err := tx.Commit(); err != nil {
 		return nil, err
 	}
-	token, err := s.createToken(req)
+	token, err := helper.CreateToken()
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 	return helper.EntityToUserLoginResponse(res, token), nil
-}
-
-func (s *UserServiceImpl) createToken(user domain.User) (string, error) {
-	secret := os.Getenv("JWT_SECRET")
-	claims := jwt.MapClaims{
-		"expiresAt": time.Now().Add(time.Hour).Unix(),
-		"username":  user.Username,
-	}
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SignedString([]byte(secret))
 }

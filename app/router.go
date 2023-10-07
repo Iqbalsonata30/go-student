@@ -1,54 +1,63 @@
 package app
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
-	"os"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/iqbalsonata30/go-student/controller"
 	"github.com/iqbalsonata30/go-student/exception"
+	"github.com/iqbalsonata30/go-student/helper"
+	"github.com/iqbalsonata30/go-student/repository"
+	"github.com/iqbalsonata30/go-student/service"
 	"github.com/julienschmidt/httprouter"
 )
 
-func NewRouter(sc controller.StudentController, uc controller.UserController) *httprouter.Router {
+func NewRouter(db *sql.DB) *httprouter.Router {
+	validate := validator.New(validator.WithRequiredStructEnabled())
+	studentRepository := repository.NewRepositoryStudent()
+	studentService := service.NewStudentService(studentRepository, db, validate)
+	studentController := controller.NewStudentContoller(studentService)
+
+	userRepository := repository.NewUserRepository()
+	userService := service.NewUserService(userRepository, db)
+	userController := controller.NewUserController(userService)
+
 	router := httprouter.New()
-	registerRoutes(router, sc, uc)
-	return router
-}
-
-func registerRoutes(router *httprouter.Router, sc controller.StudentController, uc controller.UserController) {
-	router.POST("/api/v1/students", verifyToken(sc.Create))
-	router.GET("/api/v1/students", sc.FindAll)
-	router.GET("/api/v1/students/:id", sc.FindById)
-	router.DELETE("/api/v1/students/:id", verifyToken(sc.DeleteById))
-	router.PUT("/api/v1/students/:id", verifyToken(sc.UpdateById))
-
-	router.POST("/api/v1/users", uc.Create)
-	router.POST("/api/v1/login", uc.Login)
+	studentRouter(router, studentController)
+	userRouter(router, userController)
 
 	router.NotFound = exception.NotFoundPage()
 	router.PanicHandler = exception.ErrorHandler
+	return router
 }
 
-func verifyToken(handler httprouter.Handle) httprouter.Handle {
+func studentRouter(router *httprouter.Router, sc controller.StudentController) {
+	router.POST("/api/v1/students", middleware(sc.Create))
+	router.GET("/api/v1/students", sc.FindAll)
+	router.GET("/api/v1/students/:id", sc.FindById)
+	router.DELETE("/api/v1/students/:id", middleware(sc.DeleteById))
+	router.PUT("/api/v1/students/:id", middleware(sc.UpdateById))
+
+}
+
+func userRouter(router *httprouter.Router, uc controller.UserController) {
+	router.POST("/api/v1/users", uc.Create)
+	router.POST("/api/v1/login", uc.Login)
+}
+
+func middleware(handler httprouter.Handle) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		tokenString := r.Header.Get("X-API-Key")
-		_, err := validateToken(tokenString)
+		token, err := helper.ValidateToken(tokenString)
 		if err != nil {
+			panic(exception.NewUnauthorizedError(err.Error()))
+		}
+		if !token.Valid {
 			panic(exception.NewUnauthorizedError("Unauthorized"))
 		}
 		handler(w, r, p)
 	}
-}
-
-func validateToken(token string) (*jwt.Token, error) {
-	secret := os.Getenv("JWT_SECRET")
-	return jwt.Parse(token, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", t.Header["alg"])
-		}
-		return []byte(secret), nil
-	})
-
 }

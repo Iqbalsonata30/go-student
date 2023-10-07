@@ -4,11 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/iqbalsonata30/go-student/app"
-	"github.com/iqbalsonata30/go-student/controller"
-	"github.com/iqbalsonata30/go-student/repository"
-	"github.com/iqbalsonata30/go-student/service"
 )
 
 func main() {
@@ -19,17 +15,7 @@ func main() {
 	if err := store.Init(); err != nil {
 		log.Fatal(err)
 	}
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	studentRepository := repository.NewRepositoryStudent()
-	studentService := service.NewStudentService(studentRepository, store.DB, validate)
-	studentController := controller.NewStudentContoller(studentService)
-
-	userRepository := repository.NewUserRepository()
-	userService := service.NewUserService(userRepository, store.DB)
-	userController := controller.NewUserController(userService)
-
-	router := app.NewRouter(studentController, userController)
-
+	router := app.NewRouter(store.DB)
 	server := http.Server{
 		Addr:    ":3000",
 		Handler: router,
