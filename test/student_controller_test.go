@@ -12,13 +12,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/iqbalsonata30/go-student/app"
-	"github.com/iqbalsonata30/go-student/controller"
 	"github.com/iqbalsonata30/go-student/model/domain"
 	"github.com/iqbalsonata30/go-student/repository"
-	"github.com/iqbalsonata30/go-student/service"
 )
 
 func SetupPostgresql() *sql.DB {
@@ -53,12 +50,7 @@ func SetupPostgresql() *sql.DB {
 }
 
 func SetupNewRouter(db *sql.DB) http.Handler {
-	validate := validator.New(validator.WithRequiredStructEnabled())
-	repository := repository.NewRepositoryStudent()
-
-	service := service.NewStudentService(repository, db, validate)
-	controller := controller.NewStudentContoller(service)
-	router := app.NewRouter(controller)
+	router := app.NewRouter(db)
 
 	return router
 }
@@ -67,11 +59,39 @@ func TruncateDB(db *sql.DB) {
 	db.Exec("truncate student;")
 }
 
+func registerUser(db *sql.DB, router http.Handler) {
+	reqBody := strings.NewReader(`{
+    "username":"iqbalsonata1",
+    "password":"secret"
+  }`)
+	req := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/users", reqBody)
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+}
+
+func getToken(db *sql.DB, router http.Handler) string {
+	reqBody := strings.NewReader(`{
+      "username":"iqbalsonata1",
+      "password":"secret"
+    }`)
+	req := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/login", reqBody)
+	rec := httptest.NewRecorder()
+	router.ServeHTTP(rec, req)
+	res := rec.Result()
+	body, _ := io.ReadAll(res.Body)
+	var resBody map[string]any
+	json.Unmarshal(body, &resBody)
+	token := resBody["data"].(map[string]any)["token"]
+	return token.(string)
+}
+
 func TestCreateStudent(t *testing.T) {
 	t.Run("create student success", func(t *testing.T) {
 		db := SetupPostgresql()
 		TruncateDB(db)
 		router := SetupNewRouter(db)
+		registerUser(db, router)
+		token := getToken(db, router)
 
 		reqBody := strings.NewReader(`{   
         "name":"Iqbal Sonata",
@@ -83,9 +103,10 @@ func TestCreateStudent(t *testing.T) {
     }`)
 		req := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/students", reqBody)
 		rec := httptest.NewRecorder()
+		req.Header.Set("X-API-Key", token)
 		router.ServeHTTP(rec, req)
-
 		res := rec.Result()
+
 		if res.Status != "201 Created" {
 			t.Fatalf("the status code should've 201 Created but got : %v", res.Status)
 		}
@@ -107,12 +128,13 @@ func TestCreateStudent(t *testing.T) {
 		db := SetupPostgresql()
 		TruncateDB(db)
 		router := SetupNewRouter(db)
-
+		registerUser(db, router)
+		token := getToken(db, router)
 		reqBody := strings.NewReader(`{}`)
 
 		req := httptest.NewRequest(http.MethodPost, "http://localhost:3000/api/v1/students", reqBody)
 		rec := httptest.NewRecorder()
-
+		req.Header.Set("X-API-Key", token)
 		router.ServeHTTP(rec, req)
 		res := rec.Result()
 		if res.Status != "400 Bad Request" {
@@ -274,6 +296,9 @@ func TestDeleteStudentById(t *testing.T) {
 	t.Run("Delete student sucesfully", func(t *testing.T) {
 		db := SetupPostgresql()
 		router := SetupNewRouter(db)
+		registerUser(db, router)
+		token := getToken(db, router)
+
 		tx, _ := db.Begin()
 		studentRepository := repository.NewRepositoryStudent()
 		student, _ := studentRepository.Save(context.Background(), tx, domain.Student{
@@ -287,6 +312,7 @@ func TestDeleteStudentById(t *testing.T) {
 		tx.Commit()
 		req := httptest.NewRequest(http.MethodDelete, fmt.Sprintf("http://localhost:3000/api/v1/students/%s", student.ID), nil)
 		rec := httptest.NewRecorder()
+		req.Header.Set("X-API-Key", token)
 		router.ServeHTTP(rec, req)
 		res := rec.Result()
 		if res.StatusCode != 200 {
@@ -305,8 +331,12 @@ func TestDeleteStudentById(t *testing.T) {
 		db := SetupPostgresql()
 		TruncateDB(db)
 		router := SetupNewRouter(db)
+		registerUser(db, router)
+		token := getToken(db, router)
+
 		req := httptest.NewRequest(http.MethodDelete, "http://localhost:3000/api/v1/students/asda", nil)
 		rec := httptest.NewRecorder()
+		req.Header.Set("X-API-Key", token)
 		router.ServeHTTP(rec, req)
 		res := rec.Result()
 		if res.StatusCode != 400 {
@@ -328,8 +358,12 @@ func TestDeleteStudentById(t *testing.T) {
 		db := SetupPostgresql()
 		TruncateDB(db)
 		router := SetupNewRouter(db)
+		registerUser(db, router)
+		token := getToken(db, router)
+
 		req := httptest.NewRequest(http.MethodDelete, "http://localhost:3000/api/v1/students/22a5f8df-0460-4fa8-9db3-95cac91f6f86", nil)
 		rec := httptest.NewRecorder()
+		req.Header.Set("X-API-Key", token)
 		router.ServeHTTP(rec, req)
 		res := rec.Result()
 		if res.StatusCode != 404 {
