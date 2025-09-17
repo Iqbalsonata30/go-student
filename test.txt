@@ -1,1 +1,1 @@
-this is for bamboo
+example of remote trigger
